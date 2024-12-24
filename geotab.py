@@ -1,5 +1,6 @@
 from mygeotab import API
 from datetime import timedelta
+import pandas as pd
 import json
 
 class ExtractorGeotab:
@@ -19,7 +20,13 @@ class ExtractorGeotab:
         with open("secrets\\geotab.json", "r") as file:
             credencials = json.load(file)
             return credencials["username"], credencials["password"], credencials["database"]
-        
+    
+    def base_conductores(self):
+        base_conductores = self.obtener_dispositivos()
+        df = pd.DataFrame(base_conductores)
+        df[["PAIS", "NUMERO", "ESTADO", "CODIGO", "LETRA"]] = df["name"].str.split("/", expand=True)
+        return df
+
     def obtener_ubicaciones(self, dispositivo_id):
         ahora = (self.hora_actual() - timedelta(minutes=5)).isoformat()
         try:
