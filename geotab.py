@@ -21,10 +21,20 @@ class ExtractorGeotab:
             credencials = json.load(file)
             return credencials["username"], credencials["password"], credencials["database"]
     
+    def obtener_dispositivos(self):
+        """Lista todos los dispositivos registrados en MyGeotab."""
+        try:
+            dispositivos = self.api.call("Get", typeName="Device")
+            return [{"id": d["id"], "name": d["name"]} for d in dispositivos]
+        except Exception as e:
+            print(f"Error al obtener dispositivos: {e}")
+            return []
+
     def base_conductores(self):
         base_conductores = self.obtener_dispositivos()
         df = pd.DataFrame(base_conductores)
         df[["PAIS", "NUMERO", "ESTADO", "CODIGO", "LETRA"]] = df["name"].str.split("/", expand=True)
+        df = df.drop(columns="name")
         return df
 
     def obtener_ubicaciones(self, dispositivo_id):
@@ -48,16 +58,6 @@ class ExtractorGeotab:
         except Exception as e:
             print(f"Error al obtener ubicaciones: {e}")
             return None
-        
-    def obtener_dispositivos(self):
-        """Lista todos los dispositivos registrados en MyGeotab."""
-        try:
-            dispositivos = self.api.call("Get", typeName="Device")
-            return [{"id": d["id"], "name": d["name"]} for d in dispositivos]
-        except Exception as e:
-            print(f"Error al obtener dispositivos: {e}")
-            return []
-
 
 if __name__=="__main__":
-    print(ExtractorGeotab().obtener_dispositivos())
+    print(ExtractorGeotab().obtener_ubicaciones("b347"))
