@@ -5,8 +5,17 @@ import json
 
 
 class ExtractorGeotab:
-    """Esta clase es para extraer la información georeferenciada
-    de los conductores de control de equipos en tiempo real"""
+    """
+    # Extractor de localización de los camiones
+
+    Esta clase es para extraer la información georeferenciada
+    de los conductores de control de equipos en tiempo real
+
+    >>> Sirve para hacer conección con todo tipo de vehiculos que cuentan con GPS de GeoTab.
+    >>> Extrae el ID del camión en base a su número designado.
+    >>> Entrega la latitud y longitud de los camiones designados.
+    
+    """
     def __init__(self):
         self.username, self.password, self.database = self._credencials()
         self.api = API(self.username, self.password, self.database)
