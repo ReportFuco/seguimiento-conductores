@@ -3,6 +3,7 @@ from datetime import timedelta
 import pandas as pd
 import json
 
+
 class ExtractorGeotab:
     """Esta clase es para extraer la información georeferenciada
     de los conductores de control de equipos en tiempo real"""
@@ -60,4 +61,5 @@ class ExtractorGeotab:
             return None
 
 if __name__=="__main__":
-    print(ExtractorGeotab().obtener_ubicaciones("b347"))
+    localidad = ExtractorGeotab().obtener_ubicaciones("b347")
+    print(f"latitud: {localidad["latitud"]}, longitud: {localidad["longitud"]}")
