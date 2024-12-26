@@ -1,4 +1,7 @@
 from geotab import ExtractorGeotab
+from streamlit_folium import st_folium
+from config import *
+import folium
 import streamlit as st
 
 
@@ -11,21 +14,54 @@ class InterfazVehiculos:
 
     """
     def __init__(self):
-        st.set_page_config("Seguimiento vehiculos - IDEAL", "image\\Logo ideal SA.jfif", "wide", "collapsed")
-        self.pag = ["Menú principal", "Mapa conductores"]
-        self.seleccion_pag = st.sidebar.selectbox("Páginas", self.pag)
-        self.geotab = ExtractorGeotab()
+        st.set_page_config(
+            page_title="Seguimiento vehiculos - IDEAL", 
+            page_icon="image\\Logo ideal SA.jfif", 
+            layout="wide", 
+            initial_sidebar_state="expanded")
+
+    @staticmethod
+    @st.cache_data(ttl=60)
+    def obtener_ubicacion_cache(filtro):
+        return ExtractorGeotab().obtener_ubicaciones(filtro)
+    
+    @staticmethod
+    @st.cache_data(ttl=60)
+    def camiones():
+        return ExtractorGeotab().base_conductores()
 
     def main(self):
-        if self.seleccion_pag == "Menú principal":
-            st.title("Este es el el titulo del Menu principal")
-            st.text(self.geotab.obtener_ubicaciones())
+        st.title("Seguimiento camiones Ideal")
 
-        elif self.seleccion_pag == "Mapa conductores":
-            st.title("Este es el mapa de los conductores")
+        tab1, tab2 = st.tabs(["Manual de uso", "Seguimiento recogidas"])
+        
+        with tab2:
 
+            truck = st.selectbox(
+                "Elije el número de camión", 
+                self.camiones()["NUMERO"].to_list())
             
+            filtro = self.camiones()[self.camiones()["NUMERO"] == truck].reset_index().loc[0, "id"]
+            camion = self.obtener_ubicacion_cache(filtro=filtro)
+            mapa = folium.Map(location=[camion["latitud"], camion["longitud"]], zoom_start=12)
 
+            folium.Marker(
+                location=[camion["latitud"], camion["longitud"]],
+                popup=f"Camión {truck}",
+                icon=TRUCK_ICON
+            ).add_to(mapa)
 
+            for index, row in DF_MARKETS.iterrows():
+                try:
+                    folium.Marker(
+                        location=[float(row["Lat"]), float(row["Lng"])],
+                        popup=f"""Ruta {row['Código de Dirección']}\n{row["Nombre de Dirección"]}""",
+                        icon=folium.Icon(color="red", icon="info-sign")
+                        ).add_to(mapa)
+                except Exception as e:
+                    print(f"Error al procesar la fila {index}: {e}")
+
+            st_folium(mapa, width=1980, height=600)
+        
 if __name__=="__main__":
     InterfazVehiculos().main()
