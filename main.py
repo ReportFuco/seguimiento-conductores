@@ -31,9 +31,9 @@ class InterfazVehiculos:
         return ExtractorGeotab().base_conductores()
 
     def main(self):
-        st.title("Seguimiento camiones Ideal")
+        st.title("Seguimiento camiones recogidas")
 
-        tab1, tab2 = st.tabs(["Manual de uso", "Seguimiento recogidas"])
+        tab1, tab2, tab3 = st.tabs(["Manual de uso", "Seguimiento recogidas", "Mapa calor acumulado bandejas"])
         
         with tab2:
 
@@ -55,7 +55,7 @@ class InterfazVehiculos:
                 try:
                     folium.Marker(
                         location=[float(row["Lat"]), float(row["Lng"])],
-                        popup=f"""Ruta {row['Código de Dirección']}\n{row["Nombre de Dirección"]}""",
+                        popup=f"""Ruta {row['Código de Dirección']}\n{row["Nombre de Dirección"].title()}""",
                         icon=folium.Icon(color="red", icon="info-sign")
                         ).add_to(mapa)
                 except Exception as e:
