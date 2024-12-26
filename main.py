@@ -21,12 +21,12 @@ class InterfazVehiculos:
             initial_sidebar_state="expanded")
 
     @staticmethod
-    @st.cache_data(ttl=60)
+    @st.cache_data(ttl=120)
     def obtener_ubicacion_cache(filtro):
         return ExtractorGeotab().obtener_ubicaciones(filtro)
     
     @staticmethod
-    @st.cache_data(ttl=60)
+    @st.cache_data(ttl=120)
     def camiones():
         return ExtractorGeotab().base_conductores()
 
